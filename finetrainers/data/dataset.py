@@ -633,7 +633,12 @@ class ValidationDataset(torch.utils.data.IterableDataset):
         self._data = data.to_iterable_dataset()
 
     def __iter__(self):
-        for sample in self._data:
+        iterator = iter(self._data)
+        worker_info = torch.utils.data.get_worker_info()
+        if worker_info is not None:
+            iterator = itertools.islice(iterator, worker_info.id, None, worker_info.num_workers)
+
+        for sample in iterator:
             # For consistency reasons, we mandate that "caption" is always present in the validation dataset.
             # However, since the model specifications use "prompt", we create an alias here.
             sample["prompt"] = sample["caption"]
