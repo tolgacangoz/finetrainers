@@ -154,9 +154,13 @@ class PytorchDTensorParallelBackend(BaseParallelBackend):
         drop_last = False
         if isinstance(dataset, torch.utils.data.IterableDataset) and num_workers > 1:
             drop_last = True
-            logger.info("Using `drop_last=True` for IterableDataset with multiple workers to ensure consistent batch sizes.")
+            logger.info(
+                "Using `drop_last=True` for IterableDataset with multiple workers to ensure consistent batch sizes."
+            )
 
-        dataloader = DPDataLoader(dp_local_rank, dataset, batch_size=batch_size, num_workers=num_workers, drop_last=drop_last)
+        dataloader = DPDataLoader(
+            dp_local_rank, dataset, batch_size=batch_size, num_workers=num_workers, drop_last=drop_last
+        )
         logger.debug("PytorchDTensorParallelBackend::prepare_dataloader completed!")
         return dataloader
 

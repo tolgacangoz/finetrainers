@@ -1,3 +1,4 @@
+import itertools
 import pathlib
 import random
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -24,7 +25,6 @@ from finetrainers.logging import get_logger
 from finetrainers.utils import find_files
 from finetrainers.utils.import_utils import is_datasets_version
 
-import itertools
 
 import decord  # isort:skip
 

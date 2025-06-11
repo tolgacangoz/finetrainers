@@ -1,6 +1,9 @@
-import torch
 import unittest
+
+import torch
+
 from finetrainers.data.dataset import IterableDatasetPreprocessingWrapper
+
 
 class DummyIterableDataset(torch.utils.data.IterableDataset):
     def __init__(self, num_samples=100):
@@ -10,6 +13,7 @@ class DummyIterableDataset(torch.utils.data.IterableDataset):
     def __iter__(self):
         for i in range(self.num_samples):
             yield {"caption": f"caption_{i}", "image": i}
+
 
 class TestIterableDatasetMultiWorker(unittest.TestCase):
     def test_no_duplication_with_multiple_workers(self):
@@ -26,7 +30,7 @@ class TestIterableDatasetMultiWorker(unittest.TestCase):
                 drop_last = num_workers > 1
 
                 original_dataset = DummyIterableDataset(num_samples)
-                original_items = [item['image'] for item in original_dataset]
+                original_items = [item["image"] for item in original_dataset]
 
                 wrapped_dataset = IterableDatasetPreprocessingWrapper(
                     dataset=original_dataset,
@@ -40,7 +44,7 @@ class TestIterableDatasetMultiWorker(unittest.TestCase):
                     drop_last=drop_last,
                 )
 
-                loaded_items = [item for batch in dataloader for item in batch['image'].tolist()]
+                loaded_items = [item for batch in dataloader for item in batch["image"].tolist()]
 
                 # Manually simulate the sharding and drop_last logic to get the exact expected set of items.
                 expected_items = []
@@ -50,13 +54,18 @@ class TestIterableDatasetMultiWorker(unittest.TestCase):
                         worker_items = original_items[worker_id::num_workers]
                         # 2. Simulate the drop_last logic for this worker's items
                         num_full_batches = len(worker_items) // batch_size
-                        items_to_keep_for_worker = worker_items[:num_full_batches * batch_size]
+                        items_to_keep_for_worker = worker_items[: num_full_batches * batch_size]
                         expected_items.extend(items_to_keep_for_worker)
                 else:  # This case is for num_workers == 1
                     expected_items = original_items
 
                 # Ensure no duplicates were loaded.
-                self.assertEqual(len(loaded_items), len(expected_items), f"The number of loaded items does not match the expected number for {num_workers} workers.")
+                self.assertEqual(
+                    len(loaded_items),
+                    len(expected_items),
+                    f"The number of loaded items does not match the expected number for {num_workers} workers.",
+                )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

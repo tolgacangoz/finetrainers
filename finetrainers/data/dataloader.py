@@ -20,7 +20,9 @@ class DPDataLoader(torchdata.stateful_dataloader.StatefulDataLoader, torch.distr
         collate_fn=None,
         drop_last: bool = False,
     ) -> None:
-        super().__init__(dataset, batch_size=batch_size, num_workers=num_workers, collate_fn=collate_fn, drop_last=drop_last)
+        super().__init__(
+            dataset, batch_size=batch_size, num_workers=num_workers, collate_fn=collate_fn, drop_last=drop_last
+        )
 
         self._dp_rank = rank
         self._rank_id = f"dp_rank_{rank}"
