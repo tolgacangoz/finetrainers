@@ -8,7 +8,6 @@ import unittest
 import pytest
 import torch
 from diffusers.utils import export_to_video
-from parameterized import parameterized
 from PIL import Image
 
 from finetrainers import BaseArgs, SFTTrainer, TrainingType, get_logger
