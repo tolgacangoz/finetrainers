@@ -160,10 +160,10 @@ class ControlTrainer(Trainer):
             else:
                 logger.warning(f"No QK norm modules found with identifiers: {qk_norm_identifiers}")
 
-        # Make sure the trainable params are in float32 if data sharding is not enabled. For FSDP, we need all
-        # parameters to be of the same dtype.
+        # Make sure the trainable params are in float32 if data sharding is not enabled. For FSDP, our wrapping
+        # policy handles mixed precision, so we do not need to cast all parameters to the same dtype.
         if parallel_backend.data_sharding_enabled:
-            self.transformer.to(dtype=self.args.transformer_dtype)
+            pass
         else:
             if self.args.training_type == TrainingType.CONTROL_LORA:
                 cast_training_params([self.transformer], dtype=torch.float32)
