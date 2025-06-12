@@ -112,4 +112,6 @@ class FSDPLoRATest(unittest.TestCase):
         args.dp_degree = 1
         args.dp_shards = 2
         args.batch_size = 1
+        args.compile_modules = []
+        args.compile_scopes = []
         self._test_training(args)
