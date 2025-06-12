@@ -175,7 +175,7 @@ class SFTTrainer(Trainer):
 
             parallel_backend.apply_fsdp2(
                 model=self.transformer,
-                param_dtype=self.args.transformer_dtype,
+                param_dtype=None,#self.args.transformer_dtype,
                 reduce_dtype=torch.float32,
                 output_dtype=None,
                 pp_enabled=parallel_backend.pipeline_parallel_enabled,
