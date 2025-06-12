@@ -113,11 +113,12 @@ class PytorchDTensorParallelBackend(BaseParallelBackend):
         output_dtype: torch.dtype,
         pp_enabled: bool = False,
         cpu_offload: bool = False,
+        lora_enabled: bool = False,
         device_mesh: Optional[torch.distributed.DeviceMesh] = None,
     ) -> torch.nn.Module:
         if device_mesh is None:
             device_mesh = self.get_mesh()
-        apply_fsdp2(model, device_mesh, param_dtype, reduce_dtype, output_dtype, pp_enabled, cpu_offload)
+        apply_fsdp2(model, device_mesh, param_dtype, reduce_dtype, output_dtype, pp_enabled, cpu_offload, lora_enabled)
         logger.debug("Applied PytorchDTensorParallel::apply_fsdp2 to model.")
         return model
 
@@ -471,6 +472,7 @@ def apply_fsdp2(
     output_dtype: torch.dtype,
     pp_enabled: bool = False,
     cpu_offload: bool = False,
+    lora_enabled: bool = False,
 ) -> None:
     """Apply FSDP2 on a model."""
     mp_policy = MixedPrecisionPolicy(param_dtype, reduce_dtype, output_dtype, cast_forward_inputs=True)
@@ -478,6 +480,11 @@ def apply_fsdp2(
 
     if cpu_offload:
         fsdp_config["offload_policy"] = CPUOffloadPolicy(pin_memory=True)
+
+    if lora_enabled:
+        for module in model.modules():
+            if len(list(module.children())) == 0 and any(p.requires_grad for p in module.parameters(recurse=False)):
+                fully_shard(module, **fsdp_config)
 
     def apply_fully_shard(blocks):
         for layer_index, block in enumerate(blocks):

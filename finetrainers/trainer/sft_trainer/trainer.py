@@ -180,6 +180,7 @@ class SFTTrainer(Trainer):
                 output_dtype=None,
                 pp_enabled=parallel_backend.pipeline_parallel_enabled,
                 cpu_offload=False,  # TODO(aryan): needs to be tested and allowed for enabling later
+                lora_enabled=self.args.training_type == TrainingType.LORA,
                 device_mesh=parallel_backend.get_mesh()[dp_mesh_names],
             )
         elif parallel_backend.data_replication_enabled:
